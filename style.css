@@ -1,0 +1,263 @@
+:root {
+	/* Romantic palette */
+	--bg: #1a0f1f;      /* deep plum */
+	--fg: #ffeaf2;      /* soft rose white */
+	--accent: #f472b6;  /* pink-400 */
+}
+
+* {
+	box-sizing: border-box;
+}
+
+html, body {
+	height: 100%;
+	margin: 0;
+}
+
+body {
+	background: radial-gradient(1200px 800px at 70% 10%, #2a1630 0%, var(--bg) 60%);
+	color: var(--fg);
+	font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, "Helvetica Neue", Arial, "Apple Color Emoji", "Segoe UI Emoji";
+	overflow: hidden;
+}
+
+#scene {
+	position: relative;
+	width: 100vw;
+	height: 100vh;
+	overflow: hidden;
+}
+
+.word {
+	position: absolute;
+	left: 0;
+	top: 0;
+	transform-origin: center center;
+	will-change: transform;
+	user-select: none;
+	padding: 0;
+	border-radius: 0;
+	background: transparent;
+	border: none;
+	color: var(--fg);
+	backdrop-filter: none;
+	font-weight: 700;
+	letter-spacing: 0px;
+}
+
+@media (max-width: 480px) {
+	.word { font-size: 14px; }
+}
+
+@media (min-width: 481px) {
+	.word { font-size: 18px; }
+}
+
+/* Start overlay */
+.overlay {
+	position: fixed;
+	inset: 0;
+	display: grid;
+	place-items: center;
+	background: transparent;
+	backdrop-filter: none;
+}
+
+.panel {
+	padding: 0;
+	border-radius: 0;
+	color: var(--fg);
+	background: transparent;
+	border: none;
+	text-align: center;
+}
+
+.panel h1 {
+	margin: 0 0 10px 0;
+	font-size: 24px;
+}
+
+.btn {
+	appearance: none;
+	border: none;
+	padding: 20px 32px; /* doubled */
+	border-radius: 10px;
+	background: linear-gradient(180deg, #f472b6, #ec4899);
+	color: white;
+	font-weight: 700;
+	font-size: 32px; /* larger text for double-size button */
+	cursor: pointer;
+}
+
+.btn:hover { filter: brightness(1.05); }
+.btn:active { transform: translateY(1px); }
+
+.hint {
+	opacity: 0.8;
+	margin-top: 10px;
+	font-size: 12px;
+}
+
+/* Blast visuals */
+.shockwave {
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 12px;
+	height: 12px;
+	border-radius: 9999px;
+	border: 2px solid rgba(244, 114, 182, 0.9);
+	transform: translate(-50%, -50%) scale(0);
+	opacity: 0.8;
+	pointer-events: none;
+}
+
+/* Glowing text for the selected blinking word */
+.glow {
+	text-shadow:
+		0 0 10px rgba(255, 255, 255, 0.68),
+		0 0 20px rgba(255, 255, 255, 0.44),
+		0 0 40px rgba(244, 114, 182, 0.26);
+	animation: glowPulse 1300ms ease-in-out infinite;
+}
+
+/* Enhanced glow for the clickable word (pre-blast) */
+.glow-pop {
+	/* Layered soft halo */
+	text-shadow:
+		0 0 6px rgba(255, 255, 255, 0.75),
+		0 0 12px rgba(255, 255, 255, 0.55),
+		0 0 22px rgba(244, 114, 182, 0.45),
+		0 0 38px rgba(244, 114, 182, 0.35),
+		0 0 64px rgba(244, 114, 182, 0.25);
+    /* No animation: it will naturally sync with JS opacity blinking */
+}
+
+
+@keyframes glowPulse {
+	/* Heartbeat: quick strong pulse, brief drop, smaller pulse, then rest */
+	0%, 100% {
+		text-shadow:
+			0 0 8px rgba(255, 255, 255, 0.60),
+			0 0 16px rgba(255, 255, 255, 0.36),
+			0 0 28px rgba(244, 114, 182, 0.22);
+	}
+	10% {
+		text-shadow:
+			0 0 14px rgba(255, 255, 255, 0.76),
+			0 0 30px rgba(255, 255, 255, 0.52),
+			0 0 56px rgba(244, 114, 182, 0.34);
+	}
+	14% {
+		text-shadow:
+			0 0 10px rgba(255, 255, 255, 0.64),
+			0 0 20px rgba(255, 255, 255, 0.40),
+			0 0 40px rgba(244, 114, 182, 0.26);
+	}
+	20% {
+		text-shadow:
+			0 0 12px rgba(255, 255, 255, 0.70),
+			0 0 24px rgba(255, 255, 255, 0.46),
+			0 0 48px rgba(244, 114, 182, 0.30);
+	}
+	28% {
+		text-shadow:
+			0 0 8px rgba(255, 255, 255, 0.60),
+			0 0 16px rgba(255, 255, 255, 0.36),
+			0 0 28px rgba(244, 114, 182, 0.22);
+	}
+}
+.shockwave.go {
+	transform: translate(-50%, -50%) scale(18);
+	opacity: 0;
+	transition: transform 600ms cubic-bezier(0.2, 0.7, 0.2, 1), opacity 600ms ease-out;
+}
+
+.particle {
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 4px;
+	height: 4px;
+	border-radius: 9999px;
+	background: currentColor;
+	transform: translate(-50%, -50%) scale(1);
+	opacity: 1;
+	pointer-events: none;
+}
+.particle.fly {
+	transform: translate(var(--dx, 0px), var(--dy, 0px)) scale(0.9);
+	opacity: 0;
+	transition: transform 700ms ease-out, opacity 700ms ease-out;
+}
+
+/* Post-blast messages */
+.post-overlay {
+	position: absolute;
+	inset: 0;
+	display: grid;
+	place-items: center;
+	pointer-events: none;
+}
+.post-box {
+	text-align: center;
+	color: var(--fg);
+	position: relative; /* create stacking context above emoji layer */
+	z-index: 1;
+}
+.post-line {
+	opacity: 0;
+	transform: translateY(8px);
+	/* Help the browser optimize the fade/slide */
+	will-change: opacity, transform;
+	contain: paint;
+}
+
+/* High-quality glow for the final message line */
+.post-glow {
+	/* Multi-layer, soft halo tuned for readability */
+	text-shadow:
+		0 0 2px rgba(255,255,255,0.45),
+		0 0 6px rgba(255,255,255,0.35),
+		0 0 14px rgba(244,114,182,0.30),
+		0 0 28px rgba(244,114,182,0.24),
+		0 0 46px rgba(244,114,182,0.18),
+		0 0 72px rgba(244,114,182,0.14);
+	/* No animation to keep fades smooth and light */
+}
+
+/* Emoji sprinkle layer sits behind the message text */
+.emoji-layer {
+	position: absolute;
+	inset: 0;
+	z-index: 0;
+	pointer-events: none;
+}
+.emoji {
+	position: absolute;
+	left: 0;
+	top: 0;
+	transform: translate(-50%, -50%) scale(0.7);
+	opacity: 0;
+	filter: drop-shadow(0 1px 1px rgba(0,0,0,0.15));
+	transition: transform 420ms ease, opacity 420ms ease;
+	will-change: transform, opacity;
+}
+.emoji.in {
+	transform: translate(-50%, -50%) scale(1);
+	opacity: 0.95;
+}
+
+/* Disable text selection and tap highlight on words */
+#scene, .word {
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Remove focus outline if the div ever gets focus */
+.word:focus { outline: none; }
+
+/* Optional: hide selection color just in case */
+.word::selection { background: transparent; }
